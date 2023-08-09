@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History</title>
+</head>
+<style>
+    .history-table th,
+    .history-table td {
+      padding: 8px 35px;
+      text-align: left;
+    }
+</style>
+
+<body>
+  <h1>History</h1>
+  <div id="history-table"></div>
+
+  <script>
+    fetch('/api/last_entries') // Fetch history data from the API
+      .then(response => response.json())
+      .then(entries => {
+        const table = document.createElement('table');
+        table.classList.add('history-table');
+
+        // Create table header
+        const headerRow = document.createElement('tr');
+        for (const header of ['ID',  'Expression', 'Result']) {
+          const th = document.createElement('th');
+          th.textContent = header;
+          headerRow.appendChild(th);
+        }
+        table.appendChild(headerRow);
+
+        // Fill in table rows with data
+        entries.forEach(entry => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${entry.id}</td>
+            <td>${entry.expression}</td>
+            <td>${entry.result}</td>
+          `;
+          table.appendChild(row);
+        });
+
+        // Append the table to the page
+        const historyTableDiv = document.getElementById('history-table');
+        historyTableDiv.appendChild(table);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+
+</html>

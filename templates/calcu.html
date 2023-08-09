@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Calculator</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  
+</head>
+
+<body>
+  <div class="calculator">
+    <div class="result" id="result">0</div>
+    <div class="buttons">
+      <button onclick="appendToResult('.')">.</button>
+      <button onclick="appendToResult('%')">%</button>
+      <button onclick="calculateResult()">=</button>
+      <button onclick="clearResult()">C</button>
+      <button onclick="appendToResult('7')">7</button>
+      <button onclick="appendToResult('8')">8</button>
+      <button onclick="appendToResult('9')">9</button>
+      <button onclick="appendToResult('+')">+</button>
+      <button onclick="appendToResult('4')">4</button>
+      <button onclick="appendToResult('5')">5</button>
+      <button onclick="appendToResult('6')">6</button>
+      <button onclick="appendToResult('-')">-</button>
+      <button onclick="appendToResult('1')">1</button>
+      <button onclick="appendToResult('2')">2</button>
+      <button onclick="appendToResult('3')">3</button>
+      <button onclick="appendToResult('*')">*</button>
+      <button></button>
+      <button onclick="appendToResult('0')">0</button>
+      <button onclick="showHistory()" id="history-display">History</button>
+
+
+      <button onclick="appendToResult('/')">/</button>
+      
+
+    </div>
+    
+  </div>
+
+  <script>
+    
+    function appendToResult(value) {
+      const result = document.getElementById('result');
+      if (result.textContent === '0' && value !== '.') {
+        result.textContent = value;
+      } else {
+        result.textContent += value;
+      }
+    }
+
+
+    function showHistory() {
+      fetch('/api/last_entries')
+        .then(response => response.json())
+        .then(entries => {
+          // Redirect to the history page with the data as a query parameter
+          const queryString = encodeURIComponent(JSON.stringify(entries));
+          window.location.href = `/history?data=${queryString}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+    
+    
+  
+
+    function calculateResult() {
+      const result = document.getElementById('result').innerText;
+      // console.log(typeof(result))
+      console.log(result);
+
+      fetch(`http://127.0.0.1:5000/api`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ expression: result })
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("result").textContent = `${data.result}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    function clearResult() {
+      document.getElementById('result').textContent = '0';
+    }
+  </script>
+</body>
+
+</html>
